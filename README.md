@@ -18,6 +18,7 @@ Current implementation supports the followings:<br/>
 * Cross Site Scripting detection
 * Path Traversal detection
 * SQL Injection detection
+* Now, allows specifying custom suspiciousUrlFragments, to suite your needs. 
 
 Please note that this module will never be able to detect security threats with 100% precision. The goal of this project is to catch and report the very first 'obvious' attempts, if possible.
 
@@ -38,7 +39,13 @@ app.use(expressDefend.protect({
     logFile: 'suspicious.log',        // if specified, express-defend will log it's output here
     onMaxAttemptsReached: function(ipAddress, url){
         console.log('IP address ' + ipAddress + ' is considered to be malicious, URL: ' + url);
-    } 
+    },
+    suspiciousUrlFragments: [        // specify extra url fragments that should be blocked, extends the defaults.
+        {
+            category: 'Custom Path Traversal',
+            patterns: ['etc/passwd', 'etc/pwd']
+        }
+    ]
 }));
 ```
 

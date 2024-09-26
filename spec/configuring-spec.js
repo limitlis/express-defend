@@ -19,6 +19,13 @@ function getMaliciousRequest() {
 		connection: { remoteAddress: '127.0.0.1' }
 	};
 }
+function getMaliciousRequestCustom() {
+	return {
+		originalUrl: '/login.action',
+		headers: {},
+		connection: { remoteAddress: '127.0.0.1' }
+	};
+}
 
 function getNormalRequest() {
 	return { 
@@ -85,7 +92,24 @@ describe("Check configuration: ", function() {
     // Assert
 	expect(nextMockInvoked).toBe(true);
   });
+	it('should accept custom `suspiciousUrlFragments` to expand the default set', function () {
+		const customSuspiciousUrlFragments = [
+			{
+				category: 'Extra Fragments',
+				patterns: ['login.action']
+			}
+		];
+		// Arrange
+		var interceptor = expressDefend.protect({ consoleLogging: false, dropSuspiciousRequest: true, suspiciousUrlFragments: customSuspiciousUrlFragments, maxAttempts: 1 });
+		var request = getMaliciousRequestCustom();
 
+		// Act
+		interceptor(request, responseMock, nextMock);
+
+		// Assert
+		expect(nextMockInvoked).toBe(false);
+		expect(responseMock.statusCode).toBe(403);
+	});
   it('dropSuspiciousRequest = false, allowing after 2nd attempt even if maxAttempts is 1', function() {
 
   	// Arrange
